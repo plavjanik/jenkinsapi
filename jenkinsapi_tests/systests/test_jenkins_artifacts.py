@@ -20,7 +20,7 @@ from jenkinsapi_tests.test_utils.random_strings import random_string
 
 class TestPingerJob(BaseSystemTest):
 
-    def test_artefacts(self):
+    def test_artifacts(self):
         job_name = 'create_%s' % random_string()
         job = self.jenkins.create_job(job_name, JOB_WITH_ARTIFACTS)
         job.invoke(block=True)
@@ -45,8 +45,8 @@ class TestPingerJob(BaseSystemTest):
                                              text_artifact.filename),
                                 'rb').read().strip()
             readBackText = readBackText.decode('ascii')
-            self.assertTrue(re.match(r'^PING \S+ \(127.0.0.1\)', readBackText))
-            self.assertTrue(readBackText.endswith('ms'))
+            self.assertTrue(re.match(r'^PING \S+ \(127.0.0.1\)', readBackText), "Text does not match: %r" % readBackText)
+            self.assertTrue(readBackText.endswith('ms'), "Text does not match" % readBackText)
 
             # Verify that we can hande binary artifacts
             binary_artifact.save_to_dir(tempDir)

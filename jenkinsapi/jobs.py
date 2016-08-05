@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 This module implements the Jobs class, which is intended to be a container-like
 interface for all of the jobs defined on a single Jenkins server.
@@ -82,12 +83,13 @@ class Jobs(object):
         else:
             raise UnknownJob(job_name)
 
+
     def iteritems(self):
         """
         Iterate over the names & objects for all jobs
         """
-        for job_name in self.iterkeys():
-            yield job_name, Job(None, job_name, self.jenkins)
+        for job_url, job_name in self.iter_urls_names():
+            yield job_name, Job(job_url, job_name, self.jenkins)
 
     def __contains__(self, job_name):
         """
@@ -104,6 +106,15 @@ class Jobs(object):
         for row in self._data:
             yield row['name']
 
+    def iter_urls_names(self):
+        """
+        Iterate over the URLs and names of all available jobs
+        """
+        if len(self._data) == 0:
+            self._data = self.poll().get('jobs', [])
+        for row in self._data:
+            yield row['url'], row['name']
+
     def keys(self):
         """
         Return a list of the names of all jobs
@@ -114,7 +125,7 @@ class Jobs(object):
         """
         Create a job
 
-        :param str jobname: Name of new job
+        :param str job_name: Name of new job
         :param str config: XML configuration of new job
         :returns Job: new Job object
         """
